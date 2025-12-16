@@ -1,6 +1,4 @@
-# ==========================================================
-# ETAPA 1: BUILDER (Instala dependencias)
-# ==========================================================
+
 FROM node:20-alpine as builder
 
 WORKDIR /app
@@ -11,9 +9,6 @@ RUN npm install --omit=dev
 
 COPY . .
 
-# ==========================================================
-# ETAPA 2: PRODUCCIÓN (Crea la imagen final ligera)
-# ==========================================================
 FROM node:20-alpine
 
 WORKDIR /app

@@ -1,28 +1,17 @@
 version: '3.8'
 
-# ------------------------------------------------
-# 1. Definición de Red
-# ------------------------------------------------
+
 networks:
   casino-net:
     driver: bridge
 
-# ------------------------------------------------
-# 2. Definición de Volúmenes (para persistencia)
-# ------------------------------------------------
+
 volumes:
   mysql_data:
   redis_data:
   rabbitmq_data:
 
-# ------------------------------------------------
-# 3. Definición de Servicios
-# ------------------------------------------------
 services:
-
-  # =======================================================
-  # A. Infraestructura (Bases de Datos y Broker)
-  # =======================================================
 
   # 1. MySQL Database
   mysql_db:
@@ -36,44 +25,38 @@ services:
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     ports:
-      # Puerto para conexión desde tu máquina local (para desarrollo/administración)
+      # Puerto para conexión
       - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      # Mapeo del script de inicialización desde ./bd/
+     
       - ./bd/init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - casino-net
 
-  # 2. Redis Cache
+  # 2. Redis 
   redis_cache:
     image: redis:6.2-alpine
     container_name: redis_casino_cache
     restart: always
     command: redis-server --appendonly yes
     ports:
-      # Puerto para conexión desde tu máquina local (para desarrollo/administración)
+      # Puerto para conexión 
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
       - casino-net
 
-  # 3. RabbitMQ Message Broker
+  # 3. RabbitMQ
   rabbitmq_broker:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq_casino_broker
     restart: always
     ports:
-      # Puerto de mensajería (para microservicios)
+      # Puerto de mensajería
       - "5672:5672"
-      # Puerto de la interfaz de administración web (opcional)
-      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - casino-net
-
-  # =======================================================
-  # B. Microservicios (Backend)
-  # =======================================================
