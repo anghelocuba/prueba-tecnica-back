@@ -12,10 +12,12 @@ const registrarCorreo = async (data) => {
         )
         VALUES (?, ?, ?, ?, ?, ?);
     `;
+    console.log("data")
+        console.log(data)
 
     const values = [
-        data.clientId,              
-        data.clientEmail,          
+        data.clienteId,              
+        data.clienteEmail,          
         data.subject,              
         'enviado',                
         'admin',         

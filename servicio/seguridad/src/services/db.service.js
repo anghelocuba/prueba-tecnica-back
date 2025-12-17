@@ -1,4 +1,9 @@
-const mysql = require('mysql2/promise'); 
+const mysql = require('mysql2/promise');
+const path = require('path');
+
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
+
+//parametros para conectar a la bd
 const pool = mysql.createPool({
     host: process.env.DATABASE_HOST || 'localhost', 
     user: process.env.MYSQL_USER,
@@ -10,24 +15,20 @@ const pool = mysql.createPool({
     queueLimit: 0
 });
 
-async function initializeDatabase() {
-    let connection;
+//inicializamos la base de datos
+const inicializarDB = async () => {
     try {
-        connection = await pool.getConnection();
+        const connection = await pool.getConnection();
         console.log('Conexión a la base de datos exitosa.');        
 
-    } catch (err) {
-        console.error('Error al conectar o inicializar la base de datos:', err.message);
+        connection.release();
+    } catch (error) {
+        console.error('Error crítico al conectar a la base de datos:', error.message);
         process.exit(1); 
-    } finally {
-        if (connection) {
-            connection.release();
-        }
     }
-}
-
+};
 
 module.exports = {
     pool,
-    initializeDatabase,
+    inicializarDB
 };

@@ -1,9 +1,9 @@
 const Hapi = require('@hapi/hapi');
-const { initializeDatabase } = require('./services/db.service');
+const { inicializarDB } = require('./services/db.service');
 const securityRoutes = require('./routes/seguridad.routes'); 
 
 const init = async () => {
-    await initializeDatabase(); 
+    await inicializarDB(); 
 
     const server = Hapi.server({
         port: process.env.SECURITY_PORT || 3001,
