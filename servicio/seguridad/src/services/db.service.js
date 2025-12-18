@@ -18,13 +18,13 @@ const pool = mysql.createPool({
 //inicializamos la base de datos
 const inicializarDB = async () => {
     try {
-        const connection = await pool.getConnection();
+        const connection = await pool.getConnection(); // Intenta pedir una conexion
         console.log('Conexión a la base de datos exitosa.');        
 
-        connection.release();
+        connection.release();// La devuelve al pool inmediatamente
     } catch (error) {
         console.error('Error crítico al conectar a la base de datos:', error.message);
-        process.exit(1); 
+        process.exit(1); // Detiene el servidor por completo
     }
 };
 

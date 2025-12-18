@@ -1,8 +1,8 @@
 const amqp = require('amqplib');
 const { registrarCorreo } = require('./email.service');
 
-const RABBITMQ_URL = process.env.RABBITMQ_URL || 'amqp://localhost';
-const QUEUE_NAME = 'email_queue';
+const RABBITMQ_URL = process.env.RABBITMQ_URL;
+const QUEUE_NAME = process.env.QUEUE_NAME;
 
 const iniciarConsumidor = async () => {
     try {

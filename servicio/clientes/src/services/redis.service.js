@@ -1,8 +1,10 @@
 const redis = require('redis'); 
 const { pool } = require('./db.service');
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
-const REDIS_HOST = process.env.REDIS_HOST || 'localhost'; 
-const REDIS_PORT = process.env.REDIS_PORT || 6379;
+const REDIS_HOST = process.env.REDIS_HOST; 
+const REDIS_PORT = process.env.REDIS_PORT;
 
 let cliente;
 

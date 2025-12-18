@@ -39,7 +39,7 @@ const registrarCliente = async (clientData) => {
             clienteId,
             clienteNombre: `${nombres} ${apellidos}`,
             clienteEmail: email,
-            subject: '¡Bienvenido!',
+            subject: 'Bienvenido',
             body: `Hola ${nombres}, tu registro fue exitoso con ID: ${clienteId}`
         };
          console.log("emailPayload")

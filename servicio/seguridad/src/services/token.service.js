@@ -4,14 +4,10 @@ const crypto = require('crypto');
 
 require('dotenv').config(); 
 
-const JWT_SECRET = process.env.JWT_SECRET_KEY || '4144@aset#$';
+const JWT_SECRET = process.env.JWT_SECRET_KEY;
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRATION_TIME || '5m';
 
 
-/**
- * * @param {object} [payload={}] 
- * @returns {string} 
- */
 const generarToken = async (payload = {}) => {
     const token = jwt.sign(payload, JWT_SECRET, {
         expiresIn: JWT_EXPIRES_IN,
@@ -29,10 +25,7 @@ const generarToken = async (payload = {}) => {
     }
 };
 
-/**
- * * @param {string} token
- * @returns {boolean} 
- */
+
 const validarToken = async (token) => {
     let payload;
     try {

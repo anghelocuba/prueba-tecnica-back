@@ -16,8 +16,15 @@ const init = async () => {
     console.log(`Microservicio de Seguridad corriendo en ${server.info.uri}`);
 };
 
-process.on('handler', (err) => {
-    console.log(err);
+// Maneja errores de Promesas
+process.on('unhandledRejection', (err) => {
+    console.error(`Error de Promesa no manejada: ${err.message}`);
+    process.exit(1);
+});
+
+// Maneja errores de código 
+process.on('uncaughtException', (err) => {
+    console.error(`Error de excepción no manejada: ${err.message}`);
     process.exit(1);
 });
 

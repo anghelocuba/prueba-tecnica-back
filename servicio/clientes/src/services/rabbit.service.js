@@ -1,8 +1,9 @@
 const amqp = require('amqplib'); 
+const path = require('path');
+require('dotenv').config({ path: path.resolve(__dirname, '../../.env') });
 
-const RABBITMQ_HOST = process.env.RABBITMQ_HOST || 'localhost'; 
-const RABBITMQ_URL = `amqp://${RABBITMQ_HOST}`;
-const QUEUE_NAME = 'email_queue'; 
+const RABBITMQ_URL = process.env.RABBITMQ_URL;
+const QUEUE_NAME =  process.env.QUEUE_NAME; 
 
 let channel = null;
 let connection = null;

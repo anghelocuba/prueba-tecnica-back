@@ -26,6 +26,8 @@ const registrarCorreo = async (data) => {
 
     try {
         const [result] = await pool.query(query, values);
+        console.log('result');
+        console.log(result);
         console.log('Registro exitoso');
     } catch (error) {
       
