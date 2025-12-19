@@ -7,7 +7,14 @@ const init = async () => {
 
     const server = Hapi.server({
         port: process.env.SECURITY_PORT || 3001,
-        host: process.env.APP_HOST,      
+        host: process.env.APP_HOST|| '0.0.0.0',
+        routes: { 
+            cors: { 
+                origin: ['http://localhost', 'http://127.0.0.1', 'http://localhost:4200'], 
+                additionalHeaders: ['content-type', 'authorization'],
+                credentials: true, 
+            }
+        }     
     });
 
     server.route(securityRoutes);

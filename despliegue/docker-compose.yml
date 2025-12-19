@@ -1,57 +1,163 @@
-version: '3.8'
 networks:
   casino-net:
     driver: bridge
+
 volumes:
-  mysql_data:
+  db_seguridad_data:
+  db_clientes_data:
+  db_correos_data:
   redis_data:
   rabbitmq_data:
 
 services:
-  # 1. MySQL Database
-  mysql_db:
+  # ==================== BASES DE DATOS ====================
+  db_seguridad:
     image: mysql:8.0
-    container_name: mysql_casino_db
+    container_name: db_seguridad
     restart: always
     environment:
-      # Credenciales de acceso
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: casino_db
+      MYSQL_DATABASE: seguridad_db
       MYSQL_USER: admin
       MYSQL_PASSWORD: admin
     ports:
-      # Puerto para conexión
       - "3307:3306"
     volumes:
-      - mysql_data:/var/lib/mysql
-     
-      - ./bd/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - db_seguridad_data:/var/lib/mysql
+      - ./bd/seguridad_init.sql:/docker-entrypoint-initdb.d/init.sql
     networks:
       - casino-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
 
-  # 2. Redis 
+  db_clientes:
+    image: mysql:8.0
+    container_name: db_clientes
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: clientes_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3308:3306"
+    volumes:
+      - db_clientes_data:/var/lib/mysql
+      - ./bd/clientes_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - casino-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  db_correos:
+    image: mysql:8.0
+    container_name: db_correos
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: correos_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: admin
+    ports:
+      - "3309:3306"
+    volumes:
+      - db_correos_data:/var/lib/mysql
+      - ./bd/correos_init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - casino-net
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 5s
+      retries: 10
+
+  # ==================== CACHE Y MENSAJERÍA ====================
   redis_cache:
     image: redis:6.2-alpine
     container_name: redis_casino_cache
     restart: always
-    command: redis-server --appendonly yes
     ports:
-      # Puerto para conexión 
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
       - casino-net
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
 
-  # 3. RabbitMQ
   rabbitmq_broker:
     image: rabbitmq:3-management-alpine
     container_name: rabbitmq_casino_broker
     restart: always
     ports:
-      # Puerto de mensajería
       - "5672:5672"
+      - "15672:15672"
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
     networks:
       - casino-net
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ==================== MICROSERVICIOS ====================
+  servicio_seguridad:
+    build:
+      context: ../servicio/seguridad
+      dockerfile: ../../despliegue/servicios/seguridad/Dockerfile
+    container_name: servicio_seguridad
+    restart: always
+    ports:
+      - "3001:3001"
+    env_file:
+      - ./servicios/seguridad/.env
+    networks:
+      - casino-net
+    depends_on:
+      db_seguridad:
+        condition: service_healthy
+   
+  servicio_clientes:
+    build:
+      context: ../servicio/clientes
+      dockerfile: ../../despliegue/servicios/cliente/Dockerfile
+    container_name: servicio_clientes
+    restart: always
+    ports:
+      - "3002:3002"
+    env_file:
+      - ./servicios/cliente/.env
+    networks:
+      - casino-net
+    depends_on:
+      db_clientes:
+        condition: service_healthy
+      redis_cache:
+        condition: service_healthy
+      rabbitmq_broker:
+        condition: service_healthy
+    
+  servicio_correos:
+    build:
+      context: ../servicio/correos
+      dockerfile: ../../despliegue/servicios/correo/Dockerfile
+    container_name: servicio_correos
+    restart: always
+    env_file:
+      - ./servicios/correo/.env
+    networks:
+      - casino-net
+    depends_on:
+      db_correos:
+        condition: service_healthy
+      rabbitmq_broker:
+        condition: service_healthy
+    

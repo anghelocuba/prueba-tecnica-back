@@ -30,8 +30,8 @@ try {
         port: process.env.CLIENT_PORT || 3002, 
         host: process.env.APP_HOST || '0.0.0.0', 
         routes: { 
-             cors: { 
-                origin: ['http://localhost:4200', 'http://127.0.0.1:4200'], 
+            cors: { 
+                origin: ['http://localhost', 'http://127.0.0.1', 'http://localhost:4200'], 
                 additionalHeaders: ['content-type', 'authorization'],
                 credentials: true, 
             }
